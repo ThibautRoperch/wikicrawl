@@ -1,0 +1,35 @@
+<html>
+
+
+</html>
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+
+path = [];
+
+function crawler(url_arg) {
+  let url = 'crawler.php';
+  if (url_arg) url += '?url=' + url_arg;
+
+  axios({
+    method: 'get',
+    url: url,
+    responseType: 'stream'
+  }).then(function (response) {
+      let data = response.data
+
+      if (!path.includes(data.title)) {
+        crawler(data.links[0]);
+      }
+
+      path.push(data.title)
+
+      console.log(path)
+    });
+}
+
+// crawler('https://fr.wikipedia.org/wiki/Philosophie');
+crawler();
+
+</script>
