@@ -3,13 +3,14 @@
 
 </html>
 
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<!-- <script src="https://unpkg.com/axios/dist/axios.min.js"></script> -->
+<script src="lib/axios.min.js"></script>
 <script>
 
 path = [];
 
-function crawler(url_arg) {
-  let url = 'crawler.php';
+function scraper(url_arg) {
+  let url = 'scraper.php';
   if (url_arg) url += '?url=' + url_arg;
 
   axios({
@@ -20,7 +21,7 @@ function crawler(url_arg) {
       let data = response.data
 
       if (!path.includes(data.title)) {
-        crawler(data.links[0]);
+        scraper(data.links[0]);
       }
 
       path.push(data.title)
@@ -29,7 +30,7 @@ function crawler(url_arg) {
     });
 }
 
-// crawler('https://fr.wikipedia.org/wiki/Philosophie');
-crawler();
+// scraper('https://fr.wikipedia.org/wiki/Philosophie');
+scraper('https://fr.wikipedia.org/wiki/Document');
 
 </script>
