@@ -1,36 +1,110 @@
 <html>
+  <head>
+    <meta charset="utf-8">
+  </head>
+  <body>
 
-
+    <div id="container"></div>
+  </body>
 </html>
 
 <!-- <script src="https://unpkg.com/axios/dist/axios.min.js"></script> -->
 <script src="lib/axios.min.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/sankey.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
 <script>
 
-path = [];
+async function scraper(id) {
+  let path = [];
 
-function scraper(url_arg) {
-  let url = 'scraper.php';
-  if (url_arg) url += '?url=' + url_arg;
+  let page = await requestPage();
+  while (!path.includes(page.title)) {
+    path.push(page.title)
 
-  axios({
-    method: 'get',
-    url: url,
-    responseType: 'stream'
-  }).then(function (response) {
-      let data = response.data
+    if (page.links) {
+      page = await requestPage(page.links[0]);
+    } else {
+      console.log(page);
+    }
 
-      if (!path.includes(data.title)) {
-        scraper(data.links[0]);
-      }
+  }
 
-      path.push(data.title)
-
-      console.log(path)
-    });
+  appendPath(id, path)
 }
 
-// scraper('https://fr.wikipedia.org/wiki/Philosophie');
-scraper('https://fr.wikipedia.org/wiki/Document');
+function requestPage(urlArg) {
+  let url = 'scraper.php';
+  if (urlArg) url += '?url=' + urlArg;
+
+  return new Promise(resolve => {
+    axios({
+      method: 'get',
+      url: url
+    }).then(function (response) {
+        resolve(response.data)
+      });
+  })
+}
+
+let paths = [];
+let nbDraws = 100;
+let uniquePaths = [];
+for (let i = 1; i <= nbDraws; ++i) {
+  scraper(i);
+}
+
+function appendPath(id, path) {
+  paths.push(path)
+
+  console.log("Path " + id + " ajouté : " + paths.length + "/" + nbDraws);
+
+  if (paths.length === nbDraws) {
+    for (path of paths) {
+      if (!uniquePaths.find(v => v[0] === path[0])) {
+        uniquePaths.push(path);
+      }
+    }
+
+    console.log(uniquePaths)
+
+    sankeyDiagram('container', 'Wikicrawler', pathsToData(uniquePaths));
+  }
+}
+
+function pathsToData(paths) {
+  let data = [];
+
+  for (path of paths) {
+    for (let i = 0; i < path.length - 1; ++i) {
+      let new_data = [path[i], path[i+1], 1];
+      let new_data_exists = data.find(v => v[0] === new_data[0] && v[1] === new_data[1]);
+
+      if (new_data_exists) {
+        new_data_exists[2] += 1;
+      } else {
+        data.push(new_data);
+      }
+    }
+  }
+
+  return data;
+}
+
+function sankeyDiagram(domId, title, data) {
+  console.log(data)
+
+  Highcharts.chart(domId, {
+    title: {
+      text: title
+    },
+    series: [{
+      keys: ['from', 'to', 'weight'],
+      data: data,
+      type: 'sankey',
+      name: 'Sankey demo series'
+    }]
+  });
+}
 
 </script>
