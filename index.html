@@ -4,30 +4,33 @@
   </head>
   <body>
 
-    <div id="container"></div>
+    <div id="sankeyDiagram" style="height: 50vh"></div>
+    <div id="treeMap" style="height: 50vh"></div>
+
   </body>
 </html>
 
-<!-- <script src="https://unpkg.com/axios/dist/axios.min.js"></script> -->
 <script src="lib/axios.min.js"></script>
-<script src="https://code.highcharts.com/highcharts.js"></script>
-<script src="https://code.highcharts.com/modules/sankey.js"></script>
-<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="lib/highcharts/highcharts.js"></script>
+<script src="lib/highcharts/sankey.js"></script>
+<script src="lib/highcharts/exporting.js"></script>
+<script src="js/charts.js"></script>
 <script>
 
 async function scraper(id) {
   let path = [];
 
   let page = await requestPage();
+  console.log(page.title);
+
   while (!path.includes(page.title)) {
     path.push(page.title)
 
     if (page.links) {
       page = await requestPage(page.links[0]);
     } else {
-      console.log(page);
+      console.log("ERREUR : La page n'a pas de liens" , page);
     }
-
   }
 
   appendPath(id, path)
@@ -48,7 +51,7 @@ function requestPage(urlArg) {
 }
 
 let paths = [];
-let nbDraws = 100;
+let nbDraws = 50;
 let uniquePaths = [];
 for (let i = 1; i <= nbDraws; ++i) {
   scraper(i);
@@ -68,43 +71,13 @@ function appendPath(id, path) {
 
     console.log(uniquePaths)
 
-    sankeyDiagram('container', 'Wikicrawler', pathsToData(uniquePaths));
+    dataVizualization();
   }
 }
 
-function pathsToData(paths) {
-  let data = [];
-
-  for (path of paths) {
-    for (let i = 0; i < path.length - 1; ++i) {
-      let new_data = [path[i], path[i+1], 1];
-      let new_data_exists = data.find(v => v[0] === new_data[0] && v[1] === new_data[1]);
-
-      if (new_data_exists) {
-        new_data_exists[2] += 1;
-      } else {
-        data.push(new_data);
-      }
-    }
-  }
-
-  return data;
-}
-
-function sankeyDiagram(domId, title, data) {
-  console.log(data)
-
-  Highcharts.chart(domId, {
-    title: {
-      text: title
-    },
-    series: [{
-      keys: ['from', 'to', 'weight'],
-      data: data,
-      type: 'sankey',
-      name: 'Sankey demo series'
-    }]
-  });
+function dataVizualization() {
+  sankeyDiagram('sankeyDiagram', 'Chemins', pathsToSankeyData(uniquePaths, 2));
+  // TODO les autres graphs
 }
 
 </script>

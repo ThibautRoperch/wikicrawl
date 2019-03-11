@@ -23,7 +23,7 @@ function dom_search_nodes($dom_element, $tag, $go_deep) {
 function dom_search_multiple_nodes($dom_element, $tags) {
   $children = [];
 
-  foreach ($dom_element->childNodes as $child) { // - erreurs ici - Trying to get property 'childNodes' of non-object 
+  foreach ($dom_element->childNodes as $child) {
     if (isset($child->tagName) && in_array($child->tagName, $tags)) {
       array_push($children, $child);
     }
@@ -44,6 +44,10 @@ function dom_search_attribute($dom_element, $name) {
   }
 
   return $value;
+}
+
+function dom_parent_tag($node) {
+  return $node->parentNode->tagName;
 }
 
 ?>

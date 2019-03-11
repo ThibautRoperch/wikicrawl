@@ -15,6 +15,8 @@ if (isset($_GET["url"])) {
   // $random_url = "https://fr.wikipedia.org/wiki/An%C3%A9mie_aplasique"; // Pas de liens dans le premier paragraphe, uniquement dans des listes
   // $random_url = "https://fr.wikipedia.org/wiki/Robert_L._May"; // Lien vers une date de naissance à éviter
   // $random_url = "https://fr.wikipedia.org/wiki/Hell%C3%A9an"; // Lien vers l'alphabet phonétique internationnal à éviter
+  // $random_url = "https://fr.wikipedia.org/wiki/Alphabet"; // Lien dans une balise <i> à ne pas éviter
+  // $random_url = "http://localhost/wikiscrap/scraper.php?url=https://fr.wikipedia.org/wiki/Allemand"; // Lien vers un audio de prononciation à éviter
   /* TODO */
   // $random_url = "https://fr.wikipedia.org/wiki/Faraj_Laheeb"; // Lien vers la langue de la traduction originale à éviter
   // $random_url = "https://fr.wikipedia.org/wiki/Gorinja"; // Lien vers la langue de la traduction originale à éviter
@@ -36,14 +38,14 @@ include("dom_handler.php");
 // Infos sur la page
 
 preg_match('/rel=\"canonical\" href=\"(https:\/\/fr\.wikipedia\.org\/wiki\/.+)\"/', $page, $url_node);
-$url = $url_node[1]; // - erreurs ici
+$url = $url_node[1];
 
-$title = $doc->getElementById("firstHeading")->nodeValue; // - erreurs ici
+$title = $doc->getElementById("firstHeading")->nodeValue;
 
 // Recherche des noeuds contenant du texte dans le noeud principal
 // Recherche des liens dans ces noeuds
 
-$main_content = $doc->getElementById("mw-content-text")->childNodes[0]; // - erreurs ici
+$main_content = $doc->getElementById("mw-content-text")->childNodes[0];
 
 $contents = dom_search_multiple_nodes($main_content, ["p", "ul", "ol"]);
 
@@ -52,13 +54,16 @@ $links = [];
 $i = 0;
 while (/*count($links) === 0 && */$i < count($contents)) { // Si count($links) === 0 décommenté, la recherche will stop au premier content qui a au moins un lien  
   $content = $contents[$i];
-  $content_links = dom_search_nodes($content, "a", false); // false pour éviter les liens qui sont dans un span dédié à la prononciation ou une balise time dédiée aux dates (naissance, etc)
+  $content_links = dom_search_nodes($content, "a", true);
 
   foreach ($content_links as $link) {
-    // var_dump($link->nextSibling->nextSibling); // TODO regarder dans les noeuds suivants (après les autres liens potentiels) s'il y a un span avec la classe 'lang-xxx', si c'est le cas, ne pas garder le lien
-    $href = dom_search_attribute($link, "href");
-    if (preg_match('/^\/wiki/', $href)) {
-      array_push($links, $href);
+    $parent_nodes_to_avoid = ["span", "time", "sup"];
+    if (!in_array(dom_parent_tag($link), $parent_nodes_to_avoid)) {
+      // var_dump($link->nextSibling->nextSibling); // TODO regarder dans les noeuds suivants (après les autres liens potentiels) s'il y a un span avec la classe 'lang-xxx', si c'est le cas, ne pas garder le lien
+      $href = dom_search_attribute($link, "href");
+      if (preg_match('/^\/wiki/', $href)) {
+        array_push($links, $href);
+      }
     }
   }
 
