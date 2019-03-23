@@ -4,16 +4,20 @@
   </head>
   <body>
 
-    <div id="sankeyDiagram" style="height: 50vh"></div>
-    <div id="treeMap" style="height: 50vh"></div>
+    <div id="sankeyDiagram" style="height: 40vh"></div>
+    <div id="treeMap" style="height: 30vh"></div>
+    <div id="pie" style="height: 30vh"></div>
+    <div id="networkGraph" style="height: 100vh"></div>
 
   </body>
 </html>
 
 <script src="lib/axios.min.js"></script>
 <script src="lib/highcharts/highcharts.js"></script>
-<script src="lib/highcharts/sankey.js"></script>
 <script src="lib/highcharts/exporting.js"></script>
+<script src="lib/highcharts/sankey.js"></script>
+<script src="lib/highcharts/treemap.js"></script>
+<script src="lib/highcharts/networkgraph.js"></script>
 <script src="js/charts.js"></script>
 <script>
 
@@ -51,7 +55,7 @@ function requestPage(urlArg) {
 }
 
 let paths = [];
-let nbDraws = 50;
+let nbDraws = 5;
 let uniquePaths = [];
 for (let i = 1; i <= nbDraws; ++i) {
   scraper(i);
@@ -76,8 +80,11 @@ function appendPath(id, path) {
 }
 
 function dataVizualization() {
-  sankeyDiagram('sankeyDiagram', 'Chemins', pathsToSankeyData(uniquePaths, 2));
-  // TODO les autres graphs
+  // sankeyDiagram('sankeyDiagram', 'Chemins', pathsToSankeyData(uniquePaths, 2));
+  // treeMap('treeMap', 'Pages par occurence', pathsToTreeMapData(uniquePaths));
+  pie('pie', 'Pages par occurence', pathsToPieData(uniquePaths, 0));
+  pie('pie', 'Charge des noeuds (voisins)', pathsToPieData(uniquePaths, 1));
+  networkGraph('networkGraph', 'Réseau des pages', pathsToNetworkGraphData(uniquePaths));
 }
 
 </script>
