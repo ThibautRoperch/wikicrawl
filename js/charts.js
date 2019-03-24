@@ -3,9 +3,10 @@
 function gatherDatas(paths, gather_mode) {
   /*
     gather_mode :
-      0 - Pas de regroupement, un lien entre deux noeuds donne lieu à un lien dans le diagramme
-      1 - Regroupement en fonction des noeuds du lien et calcul des occurences
+      0 - Pas de regroupement, un lien entre deux noeuds donne lieu à un tableau de deux noeuds
+      1 - Regroupement en fonction des noeuds du lien et calcul des occurences de ce lien
       2 - Regroupement en fonction des noeuds du lien avec occurences normalisées à 1
+      3 - Regroupement des prédécesseurs de chaque noeud, chaque lien // TODO
   */
 
   let data = [];
@@ -36,25 +37,11 @@ function gatherDatas(paths, gather_mode) {
 }
 
 function pathsToSankeyData(paths, gather_mode) {
-
-}
-
-function SankeyDataToOtherData(data, mode) {
-  /*
-    mode :
-     0 - Occurence des // TODO
-  */
-
-  let data = [];
-
-  if (mode === 0) data = pathsToSankeyData(paths, 1);
-  if (mode === 1)
-
-  return data;
+  return gatherDatas(paths, gather_mode);
 }
 
 function pathsToTreeMapData(paths) {
-  let data = pathsToSankeyData(paths, 1).map(link => {
+  let data = gatherDatas(paths, 1).map(link => {
       return {
         name: link[1],
         value: link[2]
@@ -76,7 +63,7 @@ function pathsToPieData(paths) {
 }
 
 function pathsToNetworkGraphData(paths) {
-  let data = pathsToSankeyData(paths, 2).map(link => {
+  let data = gatherDatas(paths, 2).map(link => {
       return [link[0], link[1]]
     });
 

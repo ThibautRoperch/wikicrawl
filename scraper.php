@@ -16,7 +16,7 @@ if (isset($_GET["url"])) {
   // $random_url = "https://fr.wikipedia.org/wiki/Robert_L._May"; // Lien vers une date de naissance à éviter
   // $random_url = "https://fr.wikipedia.org/wiki/Hell%C3%A9an"; // Lien vers l'alphabet phonétique internationnal à éviter
   // $random_url = "https://fr.wikipedia.org/wiki/Alphabet"; // Lien dans une balise <i> à ne pas éviter
-  // $random_url = "http://localhost/wikiscrap/scraper.php?url=https://fr.wikipedia.org/wiki/Allemand"; // Lien vers un audio de prononciation à éviter
+  // $random_url = "https://fr.wikipedia.org/wiki/Allemand"; // Lien vers un audio de prononciation à éviter
   /* TODO */
   // $random_url = "https://fr.wikipedia.org/wiki/Faraj_Laheeb"; // Lien vers la langue de la traduction originale à éviter
   // $random_url = "https://fr.wikipedia.org/wiki/Gorinja"; // Lien vers la langue de la traduction originale à éviter

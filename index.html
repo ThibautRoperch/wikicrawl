@@ -37,7 +37,9 @@ async function scraper(id) {
     }
   }
 
-  appendPath(id, path)
+  path.push(page.title);
+
+  appendPath(id, path);
 }
 
 function requestPage(urlArg) {
@@ -80,6 +82,7 @@ function appendPath(id, path) {
 }
 
 function dataVizualization() {
+  // sankeyDiagram('sankeyDiagram', 'Chemins', pathsToSankeyData(uniquePaths, 0));
   // sankeyDiagram('sankeyDiagram', 'Chemins', pathsToSankeyData(uniquePaths, 2));
   // treeMap('treeMap', 'Pages par occurence', pathsToTreeMapData(uniquePaths));
   pie('pie', 'Pages par occurence', pathsToPieData(uniquePaths, 0));
